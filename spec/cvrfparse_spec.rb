@@ -18,6 +18,39 @@ describe 'Cvrfparse' do
     it 'validate local' do
       expect(@parser.validate(@document_valid, @schema_local)).to be_empty
     end
+
+    describe 'parse' do
+      describe 'CVRF' do
+        before(:each) { @namespace = :cvrf }
+        it 'parse for DocumentTitle must be not empty' do
+          parsables = %w(DocumentTitle)
+          result = @parser.parse(@document_valid, parsables, @namespace)
+          expect(result).not_to be_empty
+        end
+
+        it 'parse for DocumentTitle must be named "DocumentTitle"' do
+          parsables = %w(DocumentTitle)
+          result = @parser.parse(@document_valid, parsables, @namespace)
+          expect(result[0].name.strip).to eq('DocumentTitle')
+        end
+
+        it 'parse for DocumentTitle must be have namespace "http://www.icasi.org/CVRF/schema/cvrf/1.1"' do
+          parsables = %w(DocumentTitle)
+          result = @parser.parse(@document_valid, parsables, @namespace)
+          expect(result[0].namespace.href.strip).to eq('http://www.icasi.org/CVRF/schema/cvrf/1.1')
+        end
+
+        it 'parse for DocumentTitle must be have text "Cisco Security Advisory: Cisco RVS4000 and WRVS4400N Web Management Interface Vulnerabilities"' do
+          parsables = %w(DocumentTitle)
+          result = @parser.parse(@document_valid, parsables, @namespace)
+          expect(result[0].text.strip).to eq('Cisco Security Advisory: Cisco RVS4000 and WRVS4400N Web Management Interface Vulnerabilities')
+        end
+      end
+      describe 'Product' do
+      end
+      describe 'Vulnerability' do
+      end
+    end
   end
 
   describe 'invalid' do
