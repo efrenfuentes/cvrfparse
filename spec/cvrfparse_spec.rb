@@ -18,11 +18,6 @@ describe 'Cvrfparse' do
     it 'validate local' do
       expect(@parser.validate(@document_valid, @schema_local)).to be_empty
     end
-
-    it 'parse' do
-
-      puts @parser.parse(@document_valid, ['DocumentTile', 'DocumentType'])
-    end
   end
 
   describe 'invalid' do

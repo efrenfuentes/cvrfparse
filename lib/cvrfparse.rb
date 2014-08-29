@@ -22,17 +22,14 @@ module CVRFPARSE
     def parse(document_path, parsables, namespace)
       document = Nokogiri::XML(open(document_path))
 
-      items = []
+      all_nodes = []
 
       parsables.each do |p|
         nodes = document.xpath('//x:' + p, 'x' => CVRF_NAMESPACES[namespace] )
-        nodes.each do |n|
-          node = {namespace: n.namespace.href, name: n.name, text: n.children.text}
-          items << node
-        end
+        all_nodes += nodes
       end
 
-      return items
+      return all_nodes
     end
   end
 
