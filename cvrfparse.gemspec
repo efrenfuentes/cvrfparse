@@ -8,13 +8,13 @@ Gem::Specification.new do |spec|
   spec.version       = CVRFPARSE::VERSION
   spec.authors       = ["Efrén Fuentes"]
   spec.email         = ["efrenfuentes@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
+  spec.summary       = 'Utility for validate CVRF files '
   spec.description   = %q{TODO: Write a longer description. Optional.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/efrenfuentes/cvrfparse"
   spec.license       = "GPLv3"
 
   spec.files         = `git ls-files -z`.split("\x0")
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.executables   = spec.files.grep(%r{^bin/}https://github.com/efrenfuentes/cvrfparse) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 

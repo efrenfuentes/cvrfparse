@@ -1,6 +1,6 @@
 # Cvrfparse
 
-TODO: Write a gem description
+Utility for validate CVRF files 
 
 ## Installation
 
