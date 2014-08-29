@@ -47,8 +47,10 @@ describe 'Cvrfparse' do
         end
       end
       describe 'Product' do
+        pending
       end
       describe 'Vulnerability' do
+        pending
       end
     end
   end
