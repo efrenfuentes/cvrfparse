@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'simplecov', '~> 0.9'
   spec.add_dependency 'nokogiri', '~> 1.6'
   spec.add_dependency 'thor', '~> 0.19'
+  spec.add_dependency 'mongo', '~> 1.10'
 end
