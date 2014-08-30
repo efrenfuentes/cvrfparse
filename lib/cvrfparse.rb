@@ -1,4 +1,4 @@
-require "cvrfparse/version"
+require 'cvrfparse/version'
 require 'nokogiri'
 require 'open-uri'
 
@@ -11,8 +11,8 @@ module CVRFPARSE
       vuln: 'http://www.icasi.org/CVRF/schema/vuln/1.1'
   }
 
-  class CVRF_parser
-    def validate(document_path, schema_path=CVRF_SCHEMA)
+  class CvrfParser
+    def validate(document_path, schema_path = CVRF_SCHEMA)
       schema = Nokogiri::XML::Schema(open(schema_path))
       document = Nokogiri::XML(open(document_path))
 
@@ -25,11 +25,11 @@ module CVRFPARSE
       all_nodes = []
 
       parsables.each do |p|
-        nodes = document.xpath('//x:' + p, 'x' => CVRF_NAMESPACES[namespace] )
+        nodes = document.xpath('//x:' + p, 'x' => CVRF_NAMESPACES[namespace])
         all_nodes += nodes
       end
 
-      return all_nodes
+      all_nodes
     end
   end
 

@@ -4,11 +4,14 @@ require 'cvrfparse'
 
 describe 'Cvrfparse' do
   before(:each) do
-    @parser = CVRFPARSE::CVRF_parser::new
+    @parser = CVRFPARSE::CvrfParser.new
     @schema_local = File.dirname(__FILE__) + '/schemadata/cvrf/1.1/cvrf.xsd'
-    @document_valid = File.dirname(__FILE__) + '/sample-xml/CVRF-1.1-cisco-sa-20110525-rvs4000.xml'
-    @document_invalid = File.dirname(__FILE__) + '/sample-xml/CVRF-1.1-cisco-sa-20110525-rvs4000-invalid.xml'
-    @document_notwellformed = File.dirname(__FILE__) + '/sample-xml/CVRF-1.1-cisco-sa-20110525-rvs4000-notwellformed.xml'
+    @document_valid = File.dirname(__FILE__) +
+              '/sample-xml/CVRF-1.1-cisco-sa-20110525-rvs4000.xml'
+    @document_invalid = File.dirname(__FILE__) +
+              '/sample-xml/CVRF-1.1-cisco-sa-20110525-rvs4000-invalid.xml'
+    @document_notwellformed = File.dirname(__FILE__) +
+              '/sample-xml/CVRF-1.1-cisco-sa-20110525-rvs4000-notwellformed.xml'
   end
 
   describe 'valid' do

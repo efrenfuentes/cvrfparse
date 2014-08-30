@@ -3,7 +3,7 @@ require 'thor'
 require 'cvrfparse'
 require 'json'
 
-class CvrfParse < Thor
+class CvrfParseCLI < Thor
   include Thor::Actions
 
   def self.source_root
@@ -30,7 +30,6 @@ class CvrfParse < Thor
 
     nodes = parse(document, parsables, namespace)
     print_nodes(nodes, options[:show_namespace])
-  
   end
 
   desc 'vuln [DOCUMENT]', 'extract Vulnerability info for document'
@@ -58,7 +57,6 @@ class CvrfParse < Thor
 
     nodes = parse(document, parsables, namespace)
     print_nodes(nodes, options[:show_namespace])
-
   end
 
   desc 'prod [DOCUMENT]', 'extract Product info for document'
@@ -76,13 +74,12 @@ class CvrfParse < Thor
 
     nodes = parse(document, parsables, namespace)
     print_nodes(nodes, options[:show_namespace])
-      
   end
 
   desc 'validate [DOCUMENT]', 'validate an CVRF document'
   method_option :schema, type: :string
   def validate(document)
-    parser = CVRFPARSE::CVRF_parser::new
+    parser = CVRFPARSE::CvrfParser.new
     schema = options[:schema]
 
     result = (schema.nil?) ? parser.validate(document) : parser.validate(document, schema)
@@ -91,40 +88,35 @@ class CvrfParse < Thor
       say 'Valid', :green
     else
       say 'Invalid', :red
-      result.each do |error|
-        say error
-      end
+      result.each { |error| say error }
     end
   end
 
   no_tasks do
     def parse(document, parsables, namespace)
-      parser = CVRFPARSE::CVRF_parser::new
+      parser = CVRFPARSE::CvrfParser.new
 
-      results = parser.parse(document, parsables, namespace)
+      parser.parse(document, parsables, namespace)
     end
 
-    def print_nodes(nodes, show_namespace, level=0)
-      nodes.each do |node|
-        print_one_node(node, show_namespace, level + 1)
-      end
+    def print_nodes(nodes, show_namespace, level = 0)
+      nodes.each { |node| print_one_node(node, show_namespace, level + 1) }
     end
 
-    def print_one_node(node, show_namespace, level=0)
+    def print_one_node(node, show_namespace, level = 0)
       length = node.children.length
       if length > 1
         say "#{"\t" * level}[#{node.name.strip}]"
-        print_nodes(node.children, show_namespace, level + 1) 
+        print_nodes(node.children, show_namespace, level + 1)
       else
         if show_namespace
-          say "#{"\t" * level}[#{node.namespace.href.strip} #{node.name.strip}] #{node.text.strip}" if !node.content.strip.empty?
+          say "#{"\t" * level}[#{node.namespace.href.strip} #{node.name.strip}] #{node.text.strip}" unless node.content.strip.empty?
         else
-          say "#{"\t" * level}[#{node.name.strip}] #{node.content.strip}" if !node.content.strip.empty?
+          say "#{"\t" * level}[#{node.name.strip}] #{node.content.strip}" unless node.content.strip.empty?
         end
       end
     end
   end
-
 end
 
-CvrfParse.start(ARGV)
+CvrfParseCLI.start(ARGV)
