@@ -2,6 +2,7 @@
 require 'thor'
 require 'cvrfparse'
 require 'json'
+require 'mongo'
 
 class CvrfParseCLI < Thor
   include Thor::Actions
@@ -76,7 +77,7 @@ class CvrfParseCLI < Thor
     print_nodes(nodes, options[:show_namespace])
   end
 
-  desc 'validate [DOCUMENT]', 'validate an CVRF document'
+  desc 'validate [DOCUMENT]', 'validate a CVRF document'
   method_option :schema, type: :string
   def validate(document)
     parser = CVRFPARSE::CvrfParser.new
@@ -92,7 +93,52 @@ class CvrfParseCLI < Thor
     end
   end
 
+  desc 'to_mongo [DOCUMENT]', 'insert info from CVRF document to mongodb database'
+  method_option :host, type: :string, default: 'localhost'
+  method_option :port, type: :numeric, default: 27_017
+  method_option :database, type: :string, default: 'cvrf'
+  method_option :username, type: :string
+  method_option :password, type: :string
+  def to_mongo(document)
+    # DocumentTitle must be unique on mongo collection, for avoid duplicates
+    # db.cvrfdocs.ensureIndex( { "DocumentTitle" : 1 }, { unique: true } )
+    
+    mongo_client = Mongo::MongoClient.new(options[:host], options[:port])
+    db = mongo_client.db(options[:database])
+
+    if options.key?(:username) && options.key?(:password)
+      db.authenticate(options[:username], options[:password])
+    end
+
+    collection = db['cvrfdocs']
+
+    nodes = parse(document, ['cvrfdoc'], :cvrf)
+    cvrfdoc = nodes_to_bson(nodes[0].children)
+
+    begin
+      collection.insert(cvrfdoc)
+      say "#{document} inserted on mongo database", :green
+    rescue Mongo::OperationFailure => e
+      say e.message, :red
+    end
+  end
+
   no_tasks do
+    def nodes_to_bson(nodes)
+      result = {}
+      nodes.each do |node|
+        length = node.children.length
+        if length > 1
+          result[node.name] = nodes_to_bson(node.children)
+        else
+          unless node.content.strip.empty?
+            result[node.name] = node.content.strip
+          end
+        end
+      end
+      result
+    end
+
     def parse(document, parsables, namespace)
       parser = CVRFPARSE::CvrfParser.new
 
