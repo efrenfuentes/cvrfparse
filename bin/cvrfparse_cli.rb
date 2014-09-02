@@ -106,9 +106,9 @@ class CvrfParseCLI < Thor
     mongo_client = Mongo::MongoClient.new(options[:host], options[:port])
     db = mongo_client.db(options[:database])
 
-    if options.key?(:username) && options.key?(:password)
-      db.authenticate(options[:username], options[:password])
-    end
+    need_authenticate = options.key?(:username) && options.key?(:password)
+    
+    db.authenticate(options[:username], options[:password]) if need_authenticate
 
     collection = db['cvrfdocs']
 
@@ -127,14 +127,11 @@ class CvrfParseCLI < Thor
     def nodes_to_bson(nodes)
       result = {}
       nodes.each do |node|
-        length = node.children.length
-        if length > 1
-          result[node.name] = nodes_to_bson(node.children)
-        else
-          unless node.content.strip.empty?
-            result[node.name] = node.content.strip
-          end
-        end
+        have_children = node.children.length > 1
+        have_content = !node.content.strip.empty?
+
+        result[node.name] = nodes_to_bson(node.children) if have_children
+        result[node.name] = node.content.strip if have_content && !have_children
       end
       result
     end
@@ -150,16 +147,16 @@ class CvrfParseCLI < Thor
     end
 
     def print_one_node(node, show_namespace, level = 0)
-      length = node.children.length
-      if length > 1
+      have_children = node.children.length > 1
+      have_content = !node.content.strip.empty?
+      if have_children
         say "#{"\t" * level}[#{node.name.strip}]"
         print_nodes(node.children, show_namespace, level + 1)
       else
-        if show_namespace
-          say "#{"\t" * level}[#{node.namespace.href.strip} #{node.name.strip}] #{node.text.strip}" unless node.content.strip.empty?
-        else
-          say "#{"\t" * level}[#{node.name.strip}] #{node.content.strip}" unless node.content.strip.empty?
-        end
+        cadena = "#{"\t" * level}["
+        cadena << "#{node.namespace.href.strip} " if show_namespace
+        cadena << "#{node.name.strip}] #{node.content.strip}"
+        say cadena if have_content
       end
     end
   end
